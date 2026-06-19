@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="bn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SFC TOOLS CHECKER | VEHICLE INSPECTION</title>
+    <style>
+        /* তোমার আগের পুরো স্টাইল এখানে কপি করবে */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+            background: #f4f7fc;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ... বাকি সব স্টাইল ঠিক একই থাকবে ... */
+        /* ==== নিচে জরুরি কিছু স্টাইল আবার লিখছি যাতে হারিয়ে না যায় ==== */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .login-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .login-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 40px 32px 32px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            animation: slideUp 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            font-size: 2.8rem;
+            margin-bottom: 6px;
+        }
+
+        .login-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0b2b44;
+            margin-bottom: 4px;
+        }
+
+        .login-subtitle {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 28px;
+        }
+
+        .login-input-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        .login-input-group label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 6px;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 2px solid #ddd;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            background: #f9fafb;
+        }
+
+        .login-error {
+            color: #dc3545;
+            font-size: 0.75rem;
+            min-height: 18px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: #ffc107;
+            color: #1e2a3a;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            background: #e0a800;
+        }
+
+        .login-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-8px);
+            }
+
+            40% {
+                transform: translateX(8px);
+            }
+
+            60% {
+                transform: translateX(-5px);
+            }
+
+            80% {
+                transform: translateX(5px);
+            }
+        }
+
+        .app {
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .app.visible {
+            opacity: 1;
+        }
+
+        .top-header {
+            background: #ddd;
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sidebar {
+            background: #ddd;
+            width: 280px;
+            transition: width 0.22s;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            overflow: hidden;
+        }
+
+        th {
+            background: #ddd !important;
+            color: #1e293b !important;
+        }
+
+        td.changed-cell {
+            background-color: #000000 !important;
+            color: white !important;
+        }
+
+        .status-yes {
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .status-no {
+            background: #dc3545;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .status-nd {
+            background: #6c757d;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .tire-badge {
+            background: #ff9800;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+
+        .days-badge,
+        .gap-badge {
+            background: #17a2b8;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+
+        .gap-warning {
+            background: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 20px;
+        }
+
+        .url-link {
+            background: #2c7da0;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-decoration: none;
+        }
+
+        .pagination-container {
+            background: #ddd;
+            padding: 12px 20px;
+        }
+
+        .page-btn {
+            background: rgba(0, 0, 0, 0.15);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 30px;
+        }
+
+        .page-btn.active-page {
+            background: #ffc107;
+        }
+
+        /* বাকি সমস্ত স্টাইল তোমার আগের কোড থেকে নেবে (আমি সংক্ষিপ্ত করলাম) */
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN OVERLAY -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-card" id="loginCard">
+            <div class="login-logo">🔐</div>
+            <div class="login-title">SFC TOOLS CHECKER</div>
+            <div class="login-subtitle">Vehicle Inspection System · Log in to continue</div>
+            <form id="loginForm" autocomplete="off" novalidate>
+                <div class="login-input-group">
+                    <label for="loginUser">👤 User ID</label>
+                    <input type="text" id="loginUser" placeholder="Enter user ID" required>
+                </div>
+                <div class="login-input-group">
+                    <label for="loginPass">🔒 Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter password" required>
+                </div>
+                <div class="login-error" id="loginError"></div>
+                <button type="submit" class="login-btn">🔓 Log In</button>
+            </form>
+            <div class="login-footer-text">Stead Fast · Authorized access only</div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div class="app" id="mainApp">
+        <div class="top-header">
+            <div class="header-left-area">
+                <button class="hamburger-btn" id="hamburgerBtn">☰</button>
+                <div class="brand" id="brandReset">Stead Fast</div>
+            </div>
+            <div class="header-center-menu">
+                <div class="hover-border"><svg viewBox="0 0 100 40">
+                        <rect x="1" y="1" width="98" height="38" rx="12" />
+                    </svg><button class="menu-btn"><a href="index.html">Home</a></button></div>
+                <div class="hover-border"><svg viewBox="0 0 100 40">
+                        <rect x="1" y="1" width="98" height="38" rx="12" />
+                    </svg><button class="menu-btn"><a href="toolsindex.html">Tools Checker</a></button></div>
+                <div class="hover-border"><svg viewBox="0 0 100 40">
+                        <rect x="1" y="1" width="98" height="38" rx="12" />
+                    </svg><button class="menu-btn"><a href="fuelindex.html">Fuel Checker</a></button></div>
+            </div>
+            <div class="header-right">
+                <input type="text" id="searchInput" class="header-search" placeholder="Search ID / Vehicle No">
+                <button class="profile-icon" id="headerProfileIcon">👤</button>
+                <button class="logout-btn-header" id="logoutBtnHeader">🚪 Logout</button>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <div class="sidebar">
+                <div class="profile-section">
+                    <div class="profile-avatar"><img src="icone1.png"
+                            onerror="this.onerror=null; this.parentElement.innerHTML='👤';"></div>
+                    <div>
+                        <div class="profile-name">Nuruddin Ahmed</div>
+                        <div class="profile-role">Asst. Manager (Fleet Operations)</div>
+                        <div class="profile-role">Team 11</div>
+                    </div>
+                </div>
+                <div class="sidebar-section">
+                    <div class="section-title">🚛 Tools Checkup Data</div>
+                    <div class="date-menu" id="dateMenu">Loading json data...</div>
+                </div>
+            </div>
+
+            <div class="right-content">
+                <div class="bottom-menu-bar">
+                    <button class="compare-mode-btn" id="overdue48Btn">⏰ 48H Over</button>
+                    <button class="compare-mode-btn" id="toggleCompareBtn">🔘 Compare Mode</button>
+                    <button class="submit-compare-btn" id="submitCompareBtn">📊 Compare</button>
+                    <div class="compare-info" id="compareInfo">👈 Click compare mode, select 2 days</div>
+                    <div id="selectedDatesDisplay" class="selected-dates-badge" style="display:none;"></div>
+                    <div id="compareSummaryBadge" class="compare-summary-badge" style="display:none;"></div>
+                    <div id="overdueFilterBadge" class="filter-badge" style="display:none;">⚠️ Filter: >48H overdue
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>URL</th>
+                                <th>Vehicle No</th>
+                                <th>Lock</th>
+                                <th>Jack</th>
+                                <th>Wrench</th>
+                                <th>Lever</th>
+                                <th>Pipe</th>
+                                <th>Tire</th>
+                                <th>Book</th>
+                                <th>Body</th>
+                                <th>Lights</th>
+                                <th>Tax</th>
+                                <th>Fitness</th>
+                                <th>Permit</th>
+                                <th>Reg</th>
+                                <th>RegAck</th>
+                                <th>Adv1</th>
+                                <th>Adv2</th>
+                                <th>Cam</th>
+                                <th>SIM</th>
+                                <th>Device</th>
+                                <th>GPS</th>
+                                <th>SD</th>
+                                <th>Last Update</th>
+                                <th>Days Gap</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr>
+                                <td colspan="27" class="no-data">Loading data...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination-container" id="paginationContainer" style="display: none;">
+                    <div class="record-info" id="recordInfo">0 record</div>
+                    <div class="pagination-controls">
+                        <button class="page-btn" id="prevPageBtn" disabled>◀ Prev</button>
+                        <span id="pageNumbers" style="display: flex; gap: 6px;"></span>
+                        <button class="page-btn" id="nextPageBtn" disabled>Next ▶</button>
+                        <select id="perPageSelect" class="per-page-select">
+                            <option value="10">10</option>
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ======================= CONFIGURATION =======================
+        const API_BASE = 'https://script.google.com/macros/s/AKfycbywWBD035_WoOt5JHUOPIT5GtfVMhnwmOjGG_3vGcI3g_Iux2YaC-9pwng1rxDzOJQEPg/exec';
+        // ⚠️ এই URL টি হবে তোমার Apps Script Web App URL
+        const SESSION_KEY = 'sfc_tools_authenticated';
+        const TOKEN_KEY = 'sfc_auth_token';
+
+        // ======================= FIELD MAPPING (আগের মতোই) =======================
+        const FIELD_MAPPING = {
+            id: ['id', 'ID', 'Vehicle ID'],
+            url: ['url', 'URL'],
+            num: ['num', 'vaical number', 'Vehicle No'],
+            lock: ['tool_lock', 'lock', 'Lock'],
+            jack: ['tool_jack', 'jack', 'Jack'],
+            wrench: ['tool_wrench', 'wrench', 'Wrench'],
+            lever: ['tool_lever', 'lever', 'Lever'],
+            pipe: ['tool_pipe', 'pipe', 'Pipe'],
+            tire: ['tool_spare_tire_brand', 'spare_tire_brand', 'tire', 'Tire'],
+            book: ['tool_service_book', 'book', 'Service Book'],
+            body: ['tool_body_check', 'body', 'Body Check'],
+            lights: ['tool_lights_ok', 'lights', 'Lights OK'],
+            tax: ['paper_tax_token_expiry', 'tax', 'Tax Token Valid'],
+            fitness: ['paper_fitness_expiry', 'fitness', 'Fitness Valid'],
+            permit: ['paper_road_permit_expiry', 'permit', 'Road Permit Valid'],
+            reg: ['paper_registration_ok', 'reg', 'Registration OK'],
+            regAck: ['paper_reg_acknowledgement_slip', 'regAck'],
+            adv1: ['paper_advertisement_part1_ok', 'adv1'],
+            adv2: ['paper_advertisement_part2_ok', 'adv2'],
+            cam: ['cam', 'Camera OK'],
+            sim: ['sim', 'SIM OK'],
+            device: ['device', 'Device Running'],
+            gps: ['gps', 'GPS Live'],
+            sd: ['sd', 'SD Card OK'],
+            updated: ['updated', 'Last Updated']
+        };
+        const STATUS_FIELDS = ['lock', 'jack', 'wrench', 'lever', 'pipe', 'book', 'body', 'lights', 'tax', 'fitness', 'permit', 'reg', 'regAck', 'adv1', 'adv2', 'cam', 'sim', 'device', 'gps', 'sd'];
+        const BEFORE_TIRE = ['lock', 'jack', 'wrench', 'lever', 'pipe'];
+        const AFTER_TIRE = ['book', 'body', 'lights', 'tax', 'fitness', 'permit', 'reg', 'regAck', 'adv1', 'adv2', 'cam', 'sim', 'device', 'gps', 'sd'];
+        const FORCE_ND_IDS = ['478', '480'];
+        const FORCE_ND_FIELDS = ['lock', 'jack', 'wrench', 'lever', 'pipe', 'tire', 'book', 'body', 'lights', 'tax', 'fitness', 'permit', 'reg', 'regAck', 'adv1', 'adv2'];
+
+        // ======================= GLOBAL VARIABLES =======================
+        let allDataFiles = {};
+        let currentDate = null;
+        let currentRawData = [];
+        let compareModeActive = false;
+        let selectedOldDate = null, selectedNewDate = null;
+        let latestCompareResult = [];
+        let isCompareView = false;
+        let currentDisplayItems = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let overdueActive = false;
+        let currentSearchText = "";
+
+        // ======================= HELPER FUNCTIONS (আগের মতো) =======================
+        function getFieldValue(obj, keys) { if (!obj) return null; for (let k of keys) if (obj[k] !== undefined && obj[k] !== null) return obj[k]; return null; }
+        function normalizeStatus(val) { if (val === undefined || val === null) return '—'; let str = String(val).trim().toUpperCase(); if (str === 'Y' || str === 'YES') return 'Y'; if (str === 'N' || str === 'NO') return 'N'; if (str === 'ND' || str === 'N/D') return 'ND'; return str || '—'; }
+        function rawValue(val) { return (val === undefined || val === null) ? '—' : String(val).trim() || '—'; }
+        function normalizeTireDisplay(val) { let str = String(val); return str.toLowerCase().includes('tire not found') ? 'NFT' : str; }
+        function applyForceNDForSpecialIds(vehicleObj, rawIdValue) { const idStr = String(rawIdValue); if (FORCE_ND_IDS.includes(idStr)) FORCE_ND_FIELDS.forEach(f => { vehicleObj[f] = 'ND'; }); return vehicleObj; }
+        function formatVehicle(v) {
+            let result = { id: getFieldValue(v, FIELD_MAPPING.id) || 'N/A', url: getFieldValue(v, FIELD_MAPPING.url) || '', num: getFieldValue(v, FIELD_MAPPING.num) || '—', updated: getFieldValue(v, FIELD_MAPPING.updated) || '—', tire: rawValue(getFieldValue(v, FIELD_MAPPING.tire)) };
+            for (let f of STATUS_FIELDS) { let val = getFieldValue(v, FIELD_MAPPING[f]); result[f] = normalizeStatus(val); }
+            result = applyForceNDForSpecialIds(result, result.id);
+            result.tireDisplay = normalizeTireDisplay(result.tire);
+            return result;
+        }
+        function getDaysGapNum(reportDateStr, lastUpdateStr) { if (!reportDateStr || !lastUpdateStr || lastUpdateStr === '—') return NaN; const r = new Date(reportDateStr), u = new Date(lastUpdateStr); if (isNaN(r) || isNaN(u)) return NaN; return Math.ceil((r - u) / 86400000); }
+        function daysGapHtml(reportDate, lastUpdate) { if (!reportDate || !lastUpdate || lastUpdate === '—') return '<span class="gap-badge">—</span>'; let diff = getDaysGapNum(reportDate, lastUpdate); if (isNaN(diff)) return '<span class="gap-badge">Invalid</span>'; if (diff < 0) return `<span class="gap-badge">Future(${Math.abs(diff)})</span>`; if (diff <= 7) return `<span class="gap-badge" style="background:#28a745;">${diff} days</span>`; if (diff <= 30) return `<span class="gap-warning">⚠️ ${diff} days</span>`; return `<span class="gap-warning" style="background:#b91c1c;">❗ ${diff} days</span>`; }
+        function statusHtml(val) { if (val === 'Y') return '<span class="status-yes">YES</span>'; if (val === 'N') return '<span class="status-no">NO</span>'; if (val === 'ND') return '<span class="status-nd">ND</span>'; return `<span class="status-other">${val === '—' ? '—' : val}</span>`; }
+
+        // ======================= AUTH FUNCTIONS =======================
+        function isAuthenticated() {
+            return sessionStorage.getItem(SESSION_KEY) === 'true' && sessionStorage.getItem(TOKEN_KEY);
+        }
+
+        async function collectDeviceData(userId) {
+            const deviceInfo = {
+                userId, timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent, platform: navigator.platform,
+                language: navigator.language, screenWidth: screen.width, screenHeight: screen.height,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            };
+            try { const ipRes = await fetch('https://api.ipify.org?format=json'); deviceInfo.ip = (await ipRes.json()).ip; } catch (e) { deviceInfo.ip = 'Unavailable'; }
+            try { const pos = await new Promise((resolve, reject) => { navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 }); }); deviceInfo.location = `${pos.coords.latitude}, ${pos.coords.longitude}`; } catch (e) { deviceInfo.location = 'Unavailable'; }
+            return deviceInfo;
+        }
+
+        async function doLogin(userId, password) {
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = 'Logging in...';
+            try {
+                const deviceData = await collectDeviceData(userId);
+                const res = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'login', user: userId, pass: password, deviceInfo: deviceData })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    sessionStorage.setItem(SESSION_KEY, 'true');
+                    sessionStorage.setItem(TOKEN_KEY, result.token);
+                    showApp();
+                } else {
+                    loginError.textContent = result.error || '❌ Invalid credentials';
+                    document.getElementById('loginCard').classList.add('login-shake');
+                    setTimeout(() => document.getElementById('loginCard').classList.remove('login-shake'), 500);
+                }
+            } catch (err) {
+                loginError.textContent = '❌ Connection error. Please try again.';
+                document.getElementById('loginCard').classList.add('login-shake');
+                setTimeout(() => document.getElementById('loginCard').classList.remove('login-shake'), 500);
+            }
+        }
+
+        function doLogout() {
+            sessionStorage.removeItem(SESSION_KEY);
+            sessionStorage.removeItem(TOKEN_KEY);
+            window._appInitialized = false;
+            allDataFiles = {};
+            currentDate = null; currentRawData = [];
+            compareModeActive = false; selectedOldDate = selectedNewDate = null;
+            latestCompareResult = []; isCompareView = false;
+            currentDisplayItems = []; currentPage = 1; overdueActive = false;
+            currentSearchText = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('dateMenu').innerHTML = 'Loading json data...';
+            document.getElementById('tableBody').innerHTML = '<tr><td colspan="27" class="no-data">Loading data...</td></tr>';
+            document.getElementById('paginationContainer').style.display = 'none';
+            document.getElementById('selectedDatesDisplay').style.display = 'none';
+            document.getElementById('compareSummaryBadge').style.display = 'none';
+            document.getElementById('overdueFilterBadge').style.display = 'none';
+            document.getElementById('compareInfo').innerHTML = '👈 Click compare mode, select 2 days';
+            document.getElementById('toggleCompareBtn').classList.remove('active-mode');
+            document.getElementById('toggleCompareBtn').innerHTML = '🔘 Compare Mode';
+            document.getElementById('overdue48Btn').classList.remove('overdue-active-btn');
+            showLogin();
+        }
+
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('mainApp').classList.remove('visible');
+            document.getElementById('loginUser').value = '';
+            document.getElementById('loginPass').value = '';
+            document.getElementById('loginError').textContent = '';
+            document.getElementById('loginUser').focus();
+        }
+
+        function showApp() {
+            document.getElementById('loginOverlay').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('visible');
+            if (!window._appInitialized) {
+                window._appInitialized = true;
+                autoLoad();
+            }
+        }
+
+        // ======================= API CALLS =======================
+        async function fetchFromAPI(params = {}) {
+            const token = sessionStorage.getItem(TOKEN_KEY);
+            if (!token) { doLogout(); throw new Error('No token'); }
+            const url = new URL(API_BASE);
+            url.searchParams.append('token', token);
+            for (let key in params) url.searchParams.append(key, params[key]);
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.error === 'Unauthorized') { doLogout(); alert('Session expired. Please login again.'); throw new Error('Unauthorized'); }
+            return data;
+        }
+
+        async function fetchPost(body) {
+            const token = sessionStorage.getItem(TOKEN_KEY);
+            if (!token) { doLogout(); throw new Error('No token'); }
+            const res = await fetch(API_BASE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ ...body, token })
+            });
+            return await res.json();
+        }
+
+        // ======================= DATA LOADING =======================
+        async function loadJsonFile(date) {
+            try {
+                const json = await fetchFromAPI({ action: 'getData', date });
+                if (!Array.isArray(json)) return null;
+                return { data: json.map(v => formatVehicle(v)), count: json.length };
+            } catch (e) { return null; }
+        }
+
+        async function autoLoad() {
+            if (!isAuthenticated()) return;
+            try {
+                const listData = await fetchFromAPI({ action: 'listDates' });
+                const dates = listData.dates || [];
+                if (dates.length === 0) {
+                    // Fallback demo data (আগের মতো দেখাতে পারো)
+                    allDataFiles['2026-04-23'] = { data: [ /* 3 demo vehicles */], count: 3 };
+                    saveToLocal();
+                    updateMenu();
+                    loadDate('2026-04-23');
+                    return;
+                }
+                // প্রথম ৩টা ডেট লোড করে বাকিগুলো ব্যাকগ্রাউন্ডে
+                for (let d of dates.slice(0, 3)) {
+                    if (!allDataFiles[d]) {
+                        const data = await loadJsonFile(d);
+                        if (data) allDataFiles[d] = data;
+                    }
+                }
+                saveToLocal();
+                updateMenu();
+                const sorted = Object.keys(allDataFiles).sort().reverse();
+                if (sorted.length) loadDate(sorted[0]);
+                // বাকি ডেটা পরে লোড করো (অপশনাল)
+                setTimeout(async () => {
+                    for (let d of dates.slice(3)) {
+                        if (!allDataFiles[d]) {
+                            const data = await loadJsonFile(d);
+                            if (data) { allDataFiles[d] = data; saveToLocal(); updateMenu(); }
+                        }
+                    }
+                }, 1000);
+            } catch (err) { console.error(err); }
+        }
+
+        // ======================= UI FUNCTIONS =======================
+        function updateMenu() {
+            const container = document.getElementById('dateMenu');
+            const dates = Object.keys(allDataFiles).sort().reverse();
+            if (!dates.length) { container.innerHTML = '<div style="padding:15px;">📭 No JSON found</div>'; return; }
+            let html = '';
+            dates.forEach(d => {
+                let cnt = allDataFiles[d].count || allDataFiles[d].data.length;
+                html += `<div class="menu-item" data-date="${d}"><div>📅 ${d}</div><div><span class="menu-count">${cnt}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteFile('${d}')">🗑️</button></div></div>`;
+            });
+            container.innerHTML = html;
+            document.querySelectorAll('.menu-item').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('delete-btn')) return;
+                    const date = el.getAttribute('data-date');
+                    if (compareModeActive) handleCompareSelection(date);
+                    else loadDate(date);
+                });
+            });
+            refreshCompareHighlight();
+        }
+
+        function loadDate(date) {
+            if (compareModeActive) return;
+            overdueActive = false; updateOverdueButtonUI();
+            currentDate = date; currentRawData = [...(allDataFiles[date]?.data || [])];
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            const activeElem = document.querySelector(`.menu-item[data-date="${date}"]`);
+            if (activeElem) activeElem.classList.add('active');
+            isCompareView = false; latestCompareResult = []; currentDisplayItems = [...currentRawData]; currentPage = 1;
+            selectedDatesDisplay.style.display = 'none'; compareSummaryBadge.style.display = 'none';
+            document.getElementById('compareInfo').innerHTML = `📅 Loaded: ${date} (${currentRawData.length} vehicles)`;
+            updateDisplayAndRender();
+        }
+
+        async function deleteFile(date) {
+            if (!confirm(`Delete "${date}"?`)) return;
+            try {
+                const res = await fetchPost({ action: 'delete', date });
+                if (res.success) {
+                    delete allDataFiles[date];
+                    saveToLocal();
+                    updateMenu();
+                    if (currentDate === date) { currentRawData = []; isCompareView = false; currentDisplayItems = []; overdueActive = false; updateOverdueButtonUI(); renderPaginationAndTable(false); }
+                    if (selectedOldDate === date || selectedNewDate === date) { selectedOldDate = selectedNewDate = null; selectedDatesDisplay.style.display = 'none'; compareSummaryBadge.style.display = 'none'; }
+                } else alert('Delete failed!');
+            } catch (err) { alert('Error deleting file.'); }
+        }
+
+        function saveToLocal() { localStorage.setItem('vehicleData', JSON.stringify(allDataFiles)); }
+
+        // ======================= COMPARE & FILTER =======================
+        function handleCompareSelection(date) { /* আগের মতোই */ }
+        function performCompare(oldD, newD) { /* আগের মতোই */ }
+        function submitCompare() { /* আগের মতোই */ }
+        function toggleCompare() { /* আগের মতোই */ }
+        function updateOverdueButtonUI() { /* আগের মতোই */ }
+        function toggleOverdueFilter() { /* আগের মতোই */ }
+        function matchesSearch(vehicle) { /* আগের মতোই */ }
+        function isOverdueVehicle(vehicle) { /* আগের মতোই */ }
+        function computeFilteredList() { /* আগের মতোই */ }
+        function updateDisplayAndRender() { /* আগের মতোই */ }
+        function renderNormalPage(pageData) { /* আগের মতোই */ }
+        function renderComparePage(pageData, oldD, newD) { /* আগের মতোই */ }
+        function renderPaginationAndTable(isComp, oldD = null, newD = null) { /* আগের মতোই */ }
+
+        // ======================= EVENT LISTENERS =======================
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const uid = document.getElementById('loginUser').value.trim();
+            const pwd = document.getElementById('loginPass').value;
+            if (!uid || !pwd) {
+                document.getElementById('loginError').textContent = '⚠️ Please enter both User ID and Password.';
+                document.getElementById('loginCard').classList.add('login-shake');
+                setTimeout(() => document.getElementById('loginCard').classList.remove('login-shake'), 500);
+                return;
+            }
+            doLogin(uid, pwd);
+        });
+
+        document.getElementById('logoutBtnHeader').addEventListener('click', doLogout);
+        document.getElementById('perPageSelect').addEventListener('change', (e) => { itemsPerPage = parseInt(e.target.value); currentPage = 1; updateDisplayAndRender(); });
+        document.getElementById('toggleCompareBtn').addEventListener('click', toggleCompare);
+        document.getElementById('submitCompareBtn').addEventListener('click', submitCompare);
+        document.getElementById('searchInput').addEventListener('input', (e) => { currentSearchText = e.target.value; currentPage = 1; updateDisplayAndRender(); });
+        document.getElementById('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage--; updateDisplayAndRender(); } });
+        document.getElementById('nextPageBtn').addEventListener('click', () => { let totalPg = Math.ceil(currentDisplayItems.length / itemsPerPage); if (currentPage < totalPg) { currentPage++; updateDisplayAndRender(); } });
+        document.getElementById('overdue48Btn').addEventListener('click', toggleOverdueFilter);
+        document.getElementById('brandReset').addEventListener('click', () => { if (compareModeActive) toggleCompare(); else if (currentDate) loadDate(currentDate); });
+        document.getElementById('headerProfileIcon').addEventListener('click', () => { if (compareModeActive) toggleCompare(); else if (currentDate) loadDate(currentDate); });
+        document.getElementById('hamburgerBtn')?.addEventListener('click', () => { document.querySelector('.sidebar').classList.toggle('collapsed'); });
+
+        // Initial load
+        if (isAuthenticated()) showApp();
+        else showLogin();
+    </script>
+</body>
+
+</html>
