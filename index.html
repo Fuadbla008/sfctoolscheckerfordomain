@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>SFC TOOLS CHECKER | VEHICLE INSPECTION</title>
     <style>
-        /* তোমার আগের পুরো স্টাইল এখানে কপি করবে */
+        
         * {
             margin: 0;
             padding: 0;
@@ -20,8 +20,6 @@
             overflow: hidden;
         }
 
-        /* ... বাকি সব স্টাইল ঠিক একই থাকবে ... */
-        /* ==== নিচে জরুরি কিছু স্টাইল আবার লিখছি যাতে হারিয়ে না যায় ==== */
         .login-overlay {
             position: fixed;
             inset: 0;
@@ -259,7 +257,7 @@
             background: #ffc107;
         }
 
-        /* বাকি সমস্ত স্টাইল তোমার আগের কোড থেকে নেবে (আমি সংক্ষিপ্ত করলাম) */
+
     </style>
 </head>
 
@@ -268,20 +266,20 @@
     <!-- LOGIN OVERLAY -->
     <div class="login-overlay" id="loginOverlay">
         <div class="login-card" id="loginCard">
-            <div class="login-logo">🔐</div>
+            <div class="login-logo"><></div>
             <div class="login-title">SFC TOOLS CHECKER</div>
             <div class="login-subtitle">Vehicle Inspection System · Log in to continue</div>
             <form id="loginForm" autocomplete="off" novalidate>
                 <div class="login-input-group">
-                    <label for="loginUser">👤 User ID</label>
+                    <label for="loginUser"> User ID</label>
                     <input type="text" id="loginUser" placeholder="Enter user ID" required>
                 </div>
                 <div class="login-input-group">
-                    <label for="loginPass">🔒 Password</label>
+                    <label for="loginPass">Password</label>
                     <input type="password" id="loginPass" placeholder="Enter password" required>
                 </div>
                 <div class="login-error" id="loginError"></div>
-                <button type="submit" class="login-btn">🔓 Log In</button>
+                <button type="submit" class="login-btn">Log In</button>
             </form>
             <div class="login-footer-text">Stead Fast · Authorized access only</div>
         </div>
@@ -307,8 +305,8 @@
             </div>
             <div class="header-right">
                 <input type="text" id="searchInput" class="header-search" placeholder="Search ID / Vehicle No">
-                <button class="profile-icon" id="headerProfileIcon">👤</button>
-                <button class="logout-btn-header" id="logoutBtnHeader">🚪 Logout</button>
+                <button class="profile-icon" id="headerProfileIcon"></button>
+                <button class="logout-btn-header" id="logoutBtnHeader">Logout</button>
             </div>
         </div>
 
@@ -324,20 +322,20 @@
                     </div>
                 </div>
                 <div class="sidebar-section">
-                    <div class="section-title">🚛 Tools Checkup Data</div>
+                    <div class="section-title">Tools Checkup Data</div>
                     <div class="date-menu" id="dateMenu">Loading json data...</div>
                 </div>
             </div>
 
             <div class="right-content">
                 <div class="bottom-menu-bar">
-                    <button class="compare-mode-btn" id="overdue48Btn">⏰ 48H Over</button>
-                    <button class="compare-mode-btn" id="toggleCompareBtn">🔘 Compare Mode</button>
-                    <button class="submit-compare-btn" id="submitCompareBtn">📊 Compare</button>
-                    <div class="compare-info" id="compareInfo">👈 Click compare mode, select 2 days</div>
+                    <button class="compare-mode-btn" id="overdue48Btn"> 48H Over</button>
+                    <button class="compare-mode-btn" id="toggleCompareBtn"> Compare Mode</button>
+                    <button class="submit-compare-btn" id="submitCompareBtn"> Compare</button>
+                    <div class="compare-info" id="compareInfo"> Click compare mode, select 2 days</div>
                     <div id="selectedDatesDisplay" class="selected-dates-badge" style="display:none;"></div>
                     <div id="compareSummaryBadge" class="compare-summary-badge" style="display:none;"></div>
-                    <div id="overdueFilterBadge" class="filter-badge" style="display:none;">⚠️ Filter: >48H overdue
+                    <div id="overdueFilterBadge" class="filter-badge" style="display:none;"> Filter: >48H overdue
                     </div>
                 </div>
                 <div class="table-wrapper">
@@ -400,11 +398,10 @@
     <script>
         // ======================= CONFIGURATION =======================
         const API_BASE = 'https://script.google.com/macros/s/AKfycbyVzATH2GxQO2v0sAAopLR2QTwqPEf0OoPEzmsU4a_xJbpbay1kZWB-vaG8LfpubrKS/exec';
-        // ⚠️ এই URL টি হবে তোমার Apps Script Web App URL
         const SESSION_KEY = 'sfc_tools_authenticated';
         const TOKEN_KEY = 'sfc_auth_token';
 
-        // ======================= FIELD MAPPING (আগের মতোই) =======================
+        //  FIELD MAPPING  
         const FIELD_MAPPING = {
             id: ['id', 'ID', 'Vehicle ID'],
             url: ['url', 'URL'],
@@ -438,7 +435,7 @@
         const FORCE_ND_IDS = ['478', '480'];
         const FORCE_ND_FIELDS = ['lock', 'jack', 'wrench', 'lever', 'pipe', 'tire', 'book', 'body', 'lights', 'tax', 'fitness', 'permit', 'reg', 'regAck', 'adv1', 'adv2'];
 
-        // ======================= GLOBAL VARIABLES =======================
+        // GLOBAL VARIABLES
         let allDataFiles = {};
         let currentDate = null;
         let currentRawData = [];
@@ -452,7 +449,7 @@
         let overdueActive = false;
         let currentSearchText = "";
 
-        // ======================= HELPER FUNCTIONS (আগের মতো) =======================
+        //  HELPER FUNCTIONS 
         function getFieldValue(obj, keys) { if (!obj) return null; for (let k of keys) if (obj[k] !== undefined && obj[k] !== null) return obj[k]; return null; }
         function normalizeStatus(val) { if (val === undefined || val === null) return '—'; let str = String(val).trim().toUpperCase(); if (str === 'Y' || str === 'YES') return 'Y'; if (str === 'N' || str === 'NO') return 'N'; if (str === 'ND' || str === 'N/D') return 'ND'; return str || '—'; }
         function rawValue(val) { return (val === undefined || val === null) ? '—' : String(val).trim() || '—'; }
@@ -469,7 +466,7 @@
         function daysGapHtml(reportDate, lastUpdate) { if (!reportDate || !lastUpdate || lastUpdate === '—') return '<span class="gap-badge">—</span>'; let diff = getDaysGapNum(reportDate, lastUpdate); if (isNaN(diff)) return '<span class="gap-badge">Invalid</span>'; if (diff < 0) return `<span class="gap-badge">Future(${Math.abs(diff)})</span>`; if (diff <= 7) return `<span class="gap-badge" style="background:#28a745;">${diff} days</span>`; if (diff <= 30) return `<span class="gap-warning">⚠️ ${diff} days</span>`; return `<span class="gap-warning" style="background:#b91c1c;">❗ ${diff} days</span>`; }
         function statusHtml(val) { if (val === 'Y') return '<span class="status-yes">YES</span>'; if (val === 'N') return '<span class="status-no">NO</span>'; if (val === 'ND') return '<span class="status-nd">ND</span>'; return `<span class="status-other">${val === '—' ? '—' : val}</span>`; }
 
-        // ======================= AUTH FUNCTIONS =======================
+        //  AUTH FUNCTIONS 
         function isAuthenticated() {
             return sessionStorage.getItem(SESSION_KEY) === 'true' && sessionStorage.getItem(TOKEN_KEY);
         }
@@ -530,9 +527,9 @@
             document.getElementById('selectedDatesDisplay').style.display = 'none';
             document.getElementById('compareSummaryBadge').style.display = 'none';
             document.getElementById('overdueFilterBadge').style.display = 'none';
-            document.getElementById('compareInfo').innerHTML = '👈 Click compare mode, select 2 days';
+            document.getElementById('compareInfo').innerHTML = ' Click compare mode, select 2 days';
             document.getElementById('toggleCompareBtn').classList.remove('active-mode');
-            document.getElementById('toggleCompareBtn').innerHTML = '🔘 Compare Mode';
+            document.getElementById('toggleCompareBtn').innerHTML = ' Compare Mode';
             document.getElementById('overdue48Btn').classList.remove('overdue-active-btn');
             showLogin();
         }
@@ -579,7 +576,7 @@
             return await res.json();
         }
 
-        // ======================= DATA LOADING =======================
+        //  DATA LOADING 
         async function loadJsonFile(date) {
             try {
                 const json = await fetchFromAPI({ action: 'getData', date });
@@ -594,14 +591,14 @@
                 const listData = await fetchFromAPI({ action: 'listDates' });
                 const dates = listData.dates || [];
                 if (dates.length === 0) {
-                    // Fallback demo data (আগের মতো দেখাতে পারো)
+                    // Fallback demo data
                     allDataFiles['2026-04-23'] = { data: [ /* 3 demo vehicles */], count: 3 };
                     saveToLocal();
                     updateMenu();
                     loadDate('2026-04-23');
                     return;
                 }
-                // প্রথম ৩টা ডেট লোড করে বাকিগুলো ব্যাকগ্রাউন্ডে
+        
                 for (let d of dates.slice(0, 3)) {
                     if (!allDataFiles[d]) {
                         const data = await loadJsonFile(d);
@@ -612,7 +609,7 @@
                 updateMenu();
                 const sorted = Object.keys(allDataFiles).sort().reverse();
                 if (sorted.length) loadDate(sorted[0]);
-                // বাকি ডেটা পরে লোড করো (অপশনাল)
+                
                 setTimeout(async () => {
                     for (let d of dates.slice(3)) {
                         if (!allDataFiles[d]) {
@@ -624,15 +621,15 @@
             } catch (err) { console.error(err); }
         }
 
-        // ======================= UI FUNCTIONS =======================
+        //  UI FUNCTIONS 
         function updateMenu() {
             const container = document.getElementById('dateMenu');
             const dates = Object.keys(allDataFiles).sort().reverse();
-            if (!dates.length) { container.innerHTML = '<div style="padding:15px;">📭 No JSON found</div>'; return; }
+            if (!dates.length) { container.innerHTML = '<div style="padding:15px;"> No JSON found</div>'; return; }
             let html = '';
             dates.forEach(d => {
                 let cnt = allDataFiles[d].count || allDataFiles[d].data.length;
-                html += `<div class="menu-item" data-date="${d}"><div>📅 ${d}</div><div><span class="menu-count">${cnt}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteFile('${d}')">🗑️</button></div></div>`;
+                html += `<div class="menu-item" data-date="${d}"><div> ${d}</div><div><span class="menu-count">${cnt}</span><button class="delete-btn" onclick="event.stopPropagation(); deleteFile('${d}')"></button></div></div>`;
             });
             container.innerHTML = html;
             document.querySelectorAll('.menu-item').forEach(el => {
@@ -655,7 +652,7 @@
             if (activeElem) activeElem.classList.add('active');
             isCompareView = false; latestCompareResult = []; currentDisplayItems = [...currentRawData]; currentPage = 1;
             selectedDatesDisplay.style.display = 'none'; compareSummaryBadge.style.display = 'none';
-            document.getElementById('compareInfo').innerHTML = `📅 Loaded: ${date} (${currentRawData.length} vehicles)`;
+            document.getElementById('compareInfo').innerHTML = ` Loaded: ${date} (${currentRawData.length} vehicles)`;
             updateDisplayAndRender();
         }
 
@@ -675,22 +672,22 @@
 
         function saveToLocal() { localStorage.setItem('vehicleData', JSON.stringify(allDataFiles)); }
 
-        // ======================= COMPARE & FILTER =======================
-        function handleCompareSelection(date) { /* আগের মতোই */ }
-        function performCompare(oldD, newD) { /* আগের মতোই */ }
-        function submitCompare() { /* আগের মতোই */ }
-        function toggleCompare() { /* আগের মতোই */ }
-        function updateOverdueButtonUI() { /* আগের মতোই */ }
-        function toggleOverdueFilter() { /* আগের মতোই */ }
-        function matchesSearch(vehicle) { /* আগের মতোই */ }
-        function isOverdueVehicle(vehicle) { /* আগের মতোই */ }
-        function computeFilteredList() { /* আগের মতোই */ }
-        function updateDisplayAndRender() { /* আগের মতোই */ }
-        function renderNormalPage(pageData) { /* আগের মতোই */ }
-        function renderComparePage(pageData, oldD, newD) { /* আগের মতোই */ }
-        function renderPaginationAndTable(isComp, oldD = null, newD = null) { /* আগের মতোই */ }
+        //  COMPARE & FILTER 
+        function handleCompareSelection(date) {  }
+        function performCompare(oldD, newD) {  }
+        function submitCompare() {  }
+        function toggleCompare() {  }
+        function updateOverdueButtonUI() {  }
+        function toggleOverdueFilter() {  }
+        function matchesSearch(vehicle) {  }
+        function isOverdueVehicle(vehicle) {  }
+        function computeFilteredList() {  }
+        function updateDisplayAndRender() {  }
+        function renderNormalPage(pageData) {  }
+        function renderComparePage(pageData, oldD, newD) {  }
+        function renderPaginationAndTable(isComp, oldD = null, newD = null) {  }
 
-        // ======================= EVENT LISTENERS =======================
+        //  EVENT LISTENERS 
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const uid = document.getElementById('loginUser').value.trim();
